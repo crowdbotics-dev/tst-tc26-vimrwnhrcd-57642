@@ -1,155 +1,139 @@
-import React, { useEffect } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  Dimensions,
-  Pressable
-} from "react-native";
-import { getItem } from "../../store";
+import React from "react";
+import { View, Image, Text, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+// @ts-ignore
+import AppIntroSlider from "react-native-app-intro-slider";
 
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
-
-const Welcome = ({ navigation }) => {
-  const checkAuth = async () => {
-    const token = await getItem("token")
-    if (token) {
-      navigation.replace('homeScreen')
-    }
-  }
-
-
-
-  useEffect(() => {
-    checkAuth();
-  }, [])
-  return (
-    <View style={styles.container}>
-      <Image
-        style={styles.background}
-        // @ts-ignore
-        source={require("./assets/welcome.png")}
-      />
-      <Text style={styles.heading}>Welcome Back</Text>
-      <Text style={styles.description}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Non at sed.
-      </Text>
-      <View style={styles.buttonContainer}>
-        <Button buttonText="Sign Up" style={styles.button} onPress={() => navigation.navigate("login", {route: "SignUpScreen"})} />
-        <Button
-          buttonText="Login"
-          style={styles.button}
-          borderColor="#000"
-          backgroundColor="#fff"
-          textColor="#000"
-          hideShadow
-          onPress={() => navigation.navigate("login", {route: "LoginScreen"})}
-        />
+const Onboarding = ({
+  slidesData,
+  onDone,
+  onSkip,
+  onSlideChange,
+  bottomButton = false,
+  dotStyle,
+  activeDotStyle,
+  skipLabel,
+  doneLabel,
+  showSkipButton = true,
+  prevLabel,
+  nextLabel,
+  showPrevButton = true,
+  showNextButton = true,
+  showDoneButton = true,
+  renderNextButton,
+  renderPrevButton,
+  renderDoneButton,
+  renderSkipButton,
+  mainContainerStyle = {},
+  imageStyle = {},
+  titleStyle = {},
+  descriptionStyle = {}
+}) => {
+  const renderItem = ({ item, index }) => {
+    return (
+      <View style={[styles.slide, { backgroundColor: item.backgroundColor }]} key={index}>
+        <Text style={[styles.title, titleStyle]}>{item?.title}</Text>
+        <Image style={[styles.image, imageStyle]} source={{ uri: item?.imageURL }} />
+        <Text style={[styles.text, descriptionStyle]}>{item?.description}</Text>
       </View>
+    );
+  };
+
+  const handleDone = () => {
+
+  };
+
+  return (
+    <View style={[{ flex: 1 }, mainContainerStyle]}>
+      {slidesData
+        ? <AppIntroSlider
+          renderItem={renderItem}
+          data={slidesData}
+          onDone={onDone || handleDone}
+          onSkip={onSkip || ""}
+          onSlideChange={onSlideChange || ""}
+          showSkipButton={showSkipButton}
+          bottomButton={bottomButton}
+          dotStyle={dotStyle}
+          activeDotStyle={activeDotStyle}
+          skipLabel={skipLabel}
+          doneLabel={doneLabel}
+          nextLabel={nextLabel}
+          prevLabel={prevLabel}
+          showPrevButton={showPrevButton}
+          showNextButton={showNextButton}
+          showDoneButton={showDoneButton}
+          renderNextButton={renderNextButton}
+          renderPrevButton={renderPrevButton}
+          renderDoneButton={renderDoneButton}
+          renderSkipButton={renderSkipButton}
+        />
+        : <Text style={styles.warText}>No data found!</Text>}
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    width: windowWidth,
-    height: windowHeight
+    marginHorizontal: 16
   },
-  heading: {
-    marginTop: "20%",
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center"
-  },
-  description: {
-    fontSize: 14,
-    color: "#888888",
-    textAlign: "center",
-    paddingHorizontal: 40,
-    marginVertical: 20
-  },
-  buttonContainer: {
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginTop: 20
-  },
-  button: {
-    marginHorizontal: 20,
-    marginVertical: 10
-  },
-  background: {
-    width: 400,
-    height: 350,
-    resizeMode: "stretch"
-  }
-});
-
-export default Welcome;
-
-const Button = params => {
-  const backgroundColor = params.backgroundColor || "#000";
-  const textColor = params.textColor || "#fff";
-  const btnStyle = {
-    backgroundColor: backgroundColor,
-    borderColor: params.borderColor || backgroundColor,
-    borderWidth: 1
-  };
-  const btnText = {
-    color: textColor
-  };
-  return (
-    <View style={[buttonStyles.btnContainer, params.style]}>
-      <View style={!params.hideShadow ? buttonStyles.shadowContainer : null}>
-        <Pressable
-          style={[buttonStyles.btn, btnStyle]}
-          onPress={params.onPress}>
-          <Text style={[buttonStyles.btnText, btnText]}>
-            {params.buttonText}
-          </Text>
-          <View style={buttonStyles.childrenContainer}>{params.children}</View>
-        </Pressable>
-      </View>
-    </View>
-  );
-};
-
-const buttonStyles = StyleSheet.create({
-  btnContainer: {
+  slide: {
+    flex: 1,
+    alignItems: "center",
     justifyContent: "center"
   },
-  shadowContainer: {
-    shadowColor: "rgba(0, 0, 0, 0.5)",
-    shadowOffset: {
-      width: 0,
-      height: 5
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10
+  image: {
+    width: 320,
+    height: 320,
+    marginVertical: 32
   },
-  btn: {
-    height: 50,
-    padding: 10,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-
-    flexDirection: "row"
+  text: {
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "center"
   },
-  btnText: {
-    color: "#fff",
-    fontSize: 16,
+  title: {
+    fontSize: 22,
+    color: "white",
+    textAlign: "center"
+  },
+  warText: {
+    top: "20%",
+    marginHorizontal: "20%",
+    textAlign: "center",
+    fontSize: 20,
+    fontFamily: "system-ui",
     fontWeight: "bold"
-  },
-  childrenContainer: {
-    justifyContent: "center",
-    alignItems: "center"
   }
 });
+
+Onboarding.propTypes = {
+  slidesData: PropTypes.array,
+  onDone: PropTypes.func,
+  onSkip: PropTypes.func,
+  onSlideChange: PropTypes.func,
+  bottomButton: PropTypes.bool,
+  dotStyle: PropTypes.object,
+  activeDotStyle: PropTypes.object,
+  skipLabel: PropTypes.string,
+  doneLabel: PropTypes.string,
+  showSkipButton: PropTypes.bool,
+  prevLabel: PropTypes.string,
+  nextLabel: PropTypes.string,
+  showPrevButton: PropTypes.bool,
+  showNextButton: PropTypes.bool,
+  showDoneButton: PropTypes.bool,
+  renderNextButton: PropTypes.func,
+  renderPrevButton: PropTypes.func,
+  renderDoneButton: PropTypes.func,
+  renderSkipButton: PropTypes.func,
+  mainContainerStyle: PropTypes.object,
+  imageStyle: PropTypes.object,
+  titleStyle: PropTypes.object,
+  descriptionStyle: PropTypes.object
+};
+
+export default {
+  title: "Onboarding",
+  navigator: Onboarding
+};
